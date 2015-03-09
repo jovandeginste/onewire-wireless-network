@@ -34,8 +34,15 @@ Steps needed:
    ```
 
 The final result will be a stream of lines of this form:
-`prefix.mapped_name.sensor_type.value value timestamp`
+<pre>prefix.mapped_name.sensor_type.value value timestamp</pre>
 (the first 'value' is literal, the second one is the interpreted value)
+
+Real example:
+<pre>
+energy.onewire.jeenode1.unit.heartbeat.value 101183 1425912018
+energy.onewire.jeenode1.sensor1.temperature.value 18.1 1425912021
+energy.onewire.jeenode1.sensor2.temperature.value 18.0 1425912023
+</pre>
 
 At some point, more configuration options will be added, and the output to graphite will be one collector.
 You will be able to configure the prefix and add the server and port, and the script will send directly to
