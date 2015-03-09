@@ -32,3 +32,11 @@ Steps needed:
    ```bash
    ruby receive.rb | nc your.graphite.server 2003
    ```
+
+The final result will be a stream of lines of this form:
+`prefix.mapped_name.sensor_type.value value timestamp`
+(the first 'value' is literal, the second one is the interpreted value)
+
+At some point, more configuration options will be added, and the output to graphite will be one collector.
+You will be able to configure the prefix and add the server and port, and the script will send directly to
+the configured collector.
