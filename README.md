@@ -20,7 +20,7 @@ _tested and working with Arduino IDE 1.5.3_
 
 Patch for Arduino IDE needed: http://forum.arduino.cc/index.php/topic,116674.0.html
 
-Copy the Arduino dependencies in this repository to your Sketchbook directory (or find them yourself)
+Copy the Arduino dependencies from [this repository](https://github.com/jovandeginste/onewire-wireless-network-dependencies) to your Sketchbook directory (or find them yourself)
 * hardware (for JNµ):
 	* jeelabs: https://github.com/jcw/ide-hardware
 * libraries:
