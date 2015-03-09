@@ -1,6 +1,7 @@
 You can use this to send data to graphite (https://github.com/graphite-project)
 
 Steps needed:
+
 1. complete the mapping.yaml
    An example is included, but basically you need to map any unique hex id to a graphite (sub)path
 
