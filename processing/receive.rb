@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 
 DEBUG = false
+VERBOSE = true
 
 require "serialport"
 require "yaml"
@@ -21,16 +22,20 @@ data_bits = config_receiver[:data_bits]
 stop_bits = config_receiver[:stop_bits]
 parity = config_receiver[:parity]
 
+puts "Receiver configuration: #{config_receiver.inspect}" if DEBUG
 command = ["stty -F", port_str, baud_rate, "-hup raw -echo"].join(" ")
 system(command)
 sp = SerialPort.new(port_str, baud_rate, data_bits, stop_bits, parity)
 
+puts "Collector configuration: #{config_collector_config.inspect}" if DEBUG
 client = GraphiteAPI.new(config_collector_config)
 
-$stderr.puts "OneWire JeeLink initialized, now waiting for input..." if DEBUG
+$stderr.puts "OneWire JeeLink initialized, now waiting for input..." if VERBOSE
+
 #just read forever
 while true do
 	while (i = sp.gets.gsub(/\0/, "").chomp) do
+
 		data = i.split(" ")
 		result = {
 			status: data.shift,
@@ -38,6 +43,7 @@ while true do
 			id: data.shift(8).map{|i| "%02x" % i.to_i},
 			data: data.map(&:to_i),
 		}
+		result[:name] = config_mapping[result[:id].join] || result[:id].join
 
 		case result[:id].join(":")
 		when /^00:00:/
@@ -77,11 +83,8 @@ while true do
 			result[:type] = "temperature"
 		end
 
-		result[:name] = config_mapping[result[:id].join] || result[:id].join
-
-		$stderr.puts result.inspect if DEBUG
+		$stderr.puts result.inspect if VERBOSE
 		if result[:type] && result[:value]
-			puts "#{prefix}.#{result[:name]}.#{result[:type]}.value #{result[:value]}"
 			client.metrics(
 				[result[:name], result[:type], "value"].join(".")  => result[:value],
 			)

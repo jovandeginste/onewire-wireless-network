@@ -2,18 +2,37 @@ You can use this to send data to graphite (https://github.com/graphite-project)
 
 Steps needed:
 
-1. complete the mapping.yaml
+1. complete the config.yaml
    
-   An example is included, but basically you need to map any unique hex id to a graphite (sub)path
+   An example is included
 
-   The unit will send a heartbeat every cycle, which will have '0000XX0000000001' as id (XX is it's
-   unique id programmed via the firmware)
+   Basically you need to configure the receiver, the collector and map the names. The receiver receives
+   data from the serial (USB), the collector is the part that actually stores the data, and the mapping
+   converts the ids to 'human' names.
 
-   Every OneWire sensor will be transmitted over via the OneWire unique id; for DS18B20 temperature
-   sensors, the id starts with '28'.
+   1. receiver
 
-   The data should sent over as is to minimize power consumption on the sensors, and is processed
-   by the ruby script here.
+      This is basically the configuration for the serial port. The given example is probably sufficient,
+      you might want to doublecheck the USB port number.
+
+   2. collector
+
+      For the time being, this is highly oriented to graphite. This is the configuration as is passed to
+      the initializer of the graphite API gem (https://github.com/kontera-technologies/graphite-api).
+      It's fairly straight forward.
+
+   3. mapping
+
+      Here you map any the unique hex id to a graphite (sub)path.
+
+      The unit will send a heartbeat every cycle, which will have '0000XX0000000001' as id (XX is it's
+      unique id programmed via the firmware).
+
+      Every OneWire sensor will be transmitted over via the OneWire unique id; eg. for DS18B20 temperature
+      sensors, the id starts with '28'.
+
+      The data should be sent over as is to minimize power consumption on the sensors, and is processed
+      by the ruby script here.
 
 2. install the ruby dependencies - either or not using rvm
    
@@ -27,23 +46,4 @@ Steps needed:
    ruby receive.rb
    ```
 
-4. send the output to graphite
-   
-   ```bash
-   ruby receive.rb | nc your.graphite.server 2003
-   ```
-
-The final result will be a stream of lines of this form:
-<pre>prefix.mapped_name.sensor_type.value value timestamp</pre>
-(the first 'value' is literal, the second one is the interpreted value)
-
-Real example:
-<pre>
-energy.onewire.jeenode1.unit.heartbeat.value 101183 1425912018
-energy.onewire.jeenode1.sensor1.temperature.value 18.1 1425912021
-energy.onewire.jeenode1.sensor2.temperature.value 18.0 1425912023
-</pre>
-
-At some point, more configuration options will be added, and the output to graphite will be one collector.
-You will be able to configure the prefix and add the server and port, and the script will send directly to
-the configured collector.
+At some point, more collector options will be added.
