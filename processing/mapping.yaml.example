@@ -1,6 +1,0 @@
----
-0000010000000001: my_first_node.unit
-28c0000000000008: my_first_node.ds18b20-sensor1
-281000000000000d: my_first_node.ds18b20-sensor2
-0000020000000001: my_second_node.unit
-28a0000000000002: my_second_node.ds18b20-sensor1
