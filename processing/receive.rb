@@ -1,23 +1,31 @@
 #!/usr/bin/ruby
 
-%x[stty -F /dev/ttyUSB0 57600 -hup raw -echo]
+DEBUG = false
 
 require "serialport"
 require "yaml"
+require 'graphite-api'
 
-#params for serial port
-port_str = "/dev/ttyUSB0"  #may be different for you
-baud_rate = 57600
-data_bits = 8
-stop_bits = 1
-parity = SerialPort::NONE
-DEBUG = false
+configuration = YAML.load(File.read("config.yaml"))
 
-prefix = "energy.onewire"
+config_receiver = configuration[:receiver] || {}
+config_collector = configuration[:collector] || {}
+config_collector_type = config_collector[:type] || "none"
+config_collector_config = config_collector[:configuration] || {}
+config_mapping = configuration[:name_mapping] || {}
 
+prefix = config_collector_config[:prefix]
+port_str = config_receiver[:port_str]
+baud_rate = config_receiver[:baud_rate]
+data_bits = config_receiver[:data_bits]
+stop_bits = config_receiver[:stop_bits]
+parity = config_receiver[:parity]
+
+command = ["stty -F", port_str, baud_rate, "-hup raw -echo"].join(" ")
+system(command)
 sp = SerialPort.new(port_str, baud_rate, data_bits, stop_bits, parity)
 
-name_mapping = YAML.load(File.read("mapping.yaml"))
+client = GraphiteAPI.new(config_collector_config)
 
 $stderr.puts "OneWire JeeLink initialized, now waiting for input..." if DEBUG
 #just read forever
@@ -69,11 +77,14 @@ while true do
 			result[:type] = "temperature"
 		end
 
-		result[:name] = name_mapping[result[:id].join] || result[:id].join
+		result[:name] = config_mapping[result[:id].join] || result[:id].join
 
 		$stderr.puts result.inspect if DEBUG
 		if result[:type] && result[:value]
-			puts "#{prefix}.#{result[:name]}.#{result[:type]}.value #{result[:value]} #{Time.now.to_i}"
+			puts "#{prefix}.#{result[:name]}.#{result[:type]}.value #{result[:value]}"
+			client.metrics(
+				[result[:name], result[:type], "value"].join(".")  => result[:value],
+			)
 			$stdout.flush
 		end
 	end
