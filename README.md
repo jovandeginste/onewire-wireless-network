@@ -9,7 +9,7 @@ Building my wireless OneWire network
 
 This code runs on Arduino compatibles (including JeeLinks, JeeNodes, JeeNode Micros (JNµ)). Connect one or multiple DS18B20
 sensors (or any other 1-Wire sensor) to the nodes, and they should send their data over
-RF to a listening device (eg. a JeeLink running the w1receiver). Run the 'processing' script on the computer connected to the JeeLink
+RF to a listening device (eg. a JeeLink running the w1receiver). Run the 'processing'(https://github.com/jovandeginste/onewire-wireless-network-processing) script on the computer connected to the JeeLink
 
 JeeNodes can be programmed over USB, JeeNode micro's over ISP.
 
